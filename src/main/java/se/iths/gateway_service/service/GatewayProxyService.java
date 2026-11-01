@@ -58,6 +58,17 @@ public class GatewayProxyService {
     }
 
     /**
+     * Skickar demoåterställning av lösenord till auth-service utan JWT.
+     *
+     * @param requestBody kontots e-postadress och nytt lösenord
+     * @param contentType klientens Content-Type
+     * @return auth-services svar eller anslutningsfel
+     */
+    public ResponseEntity<String> resetPassword(String requestBody, String contentType) {
+        return forwardPost(authServiceUrl, "/appusers/password-reset", requestBody, null, contentType);
+    }
+
+    /**
      * Skickar DELETE till den egna användarens konto hos auth-service.
      *
      * @param requestBody lösenordet för att bekräfta radering

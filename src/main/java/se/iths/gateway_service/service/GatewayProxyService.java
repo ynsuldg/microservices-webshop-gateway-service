@@ -47,6 +47,17 @@ public class GatewayProxyService {
     }
 
     /**
+     * Skapar ett användarkonto via auth-service utan att vidarebefordra någon JWT.
+     *
+     * @param requestBody registreringsuppgifter från klienten
+     * @param contentType klientens Content-Type
+     * @return auth-services svar med samma HTTP-status
+     */
+    public ResponseEntity<String> register(String requestBody, String contentType) {
+        return forwardPost(authServiceUrl, "/appusers", requestBody, null, contentType);
+    }
+
+    /**
      * Vidarebefordrar ett inloggningsförsök till auth-service.
      *
      * @param requestBody oförändrad request-body från klienten

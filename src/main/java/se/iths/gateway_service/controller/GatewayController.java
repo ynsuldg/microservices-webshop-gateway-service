@@ -20,6 +20,12 @@ public class GatewayController {
     private final GatewayProxyService proxyService;
     private final ObjectMapper objectMapper;
 
+    /**
+     * Skapar GatewayController med de beroenden och inställningar som tjänsten behöver.
+     *
+     * @param proxyService vidarebefordrar API-anrop till mikrotjänsterna
+     * @param objectMapper omvandlar JSON till och från Java-objekt
+     */
     public GatewayController(GatewayProxyService proxyService, ObjectMapper objectMapper) {
         this.proxyService = proxyService;
         this.objectMapper = objectMapper;

@@ -15,12 +15,22 @@ import java.net.http.HttpClient;
 import java.time.Duration;
 import java.util.List;
 
+/**
+ * Konfigurerar tjänstens autentisering, behörighetsregler och CORS.
+ */
 @Configuration
 public class SecurityConfig {
 
     @Value("${app.cors.allowed-origins}")
     private String allowedOrigins;
 
+    /**
+     * Skapar gatewayns säkerhetsfilter med CORS och sessionslösa anrop.
+     *
+     * @param http säkerhetskonfigurationen som ska byggas
+     * @return den konfigurerade säkerhetsfilterkedjan
+     * @throws Exception om säkerhetskonfigurationen inte kan skapas
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -33,6 +43,10 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Tillåter CORS-anrop från de konfigurerade adresserna.
+     * @return CORS-reglerna för tjänsten
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
@@ -46,6 +60,10 @@ public class SecurityConfig {
         return source;
     }
 
+    /**
+     * Skapar HTTP-klienten med anslutningstimeout.
+     * @return HTTP-klienten
+     */
     @Bean
     public HttpClient httpClient() {
         return HttpClient.newBuilder()

@@ -33,6 +33,13 @@ public class PaymentGatewayController {
         return service.status(id, authorization);
     }
 
+    // Vidarebefordrar ett uttryckligt avbrott efter att tjänsten verifierat kundens identitet.
+    @PostMapping("/{id}/cancel")
+    public Map<?, ?> cancel(@PathVariable UUID id,
+            @RequestHeader(value = "Authorization", required = false) String authorization) {
+        return service.cancel(id, authorization);
+    }
+
     // Bevarar relevanta klientfelsstatusar utan att läcka interna svar eller hemligheter.
     @ExceptionHandler(RestClientResponseException.class)
     public ResponseEntity<String> remoteResponse(RestClientResponseException exception) {

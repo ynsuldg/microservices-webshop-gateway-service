@@ -17,6 +17,8 @@ class PaymentGatewayServiceTests {
     private int paymentCalls;
     private String paymentBody;
     private String forwardedToken;
+    private String paymentPath;
+    private String paymentMethod;
     private final String secret = "internal-test-token-not-for-real-use-123456";
 
     // Startar lokala HTTP-svar för att kontrollera gatewayns faktiska anrop utan riktiga tjänster.
@@ -33,6 +35,8 @@ class PaymentGatewayServiceTests {
         });
         server.createContext("/internal/checkouts", exchange -> {
             paymentCalls++;
+            paymentPath = exchange.getRequestURI().getPath();
+            paymentMethod = exchange.getRequestMethod();
             paymentBody = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
             forwardedToken = exchange.getRequestHeaders().getFirst("X-Internal-Service-Token");
             var body = "{\"orderId\":1,\"status\":\"PENDING_PAYMENT\"}".getBytes(StandardCharsets.UTF_8);
@@ -76,6 +80,28 @@ class PaymentGatewayServiceTests {
         assertTrue(paymentBody.contains("productId"));
         assertFalse(paymentBody.contains("customer-token"));
         assertEquals(secret, forwardedToken);
+    }
+
+    // Skickar avbrottet som POST med endast verifierat kundnamn och den interna serverhemligheten.
+    @Test
+    void cancelsOnlyForVerifiedCustomer() {
+        var id = UUID.randomUUID();
+        service.cancel(id, "Bearer customer-token");
+        assertEquals("POST", paymentMethod);
+        assertEquals("/internal/checkouts/" + id + "/cancel", paymentPath);
+        assertEquals("{\"customerName\":\"verified-customer\"}", paymentBody);
+        assertEquals(secret, forwardedToken);
+    }
+
+    // Nekar avbrott innan payment-service nås om kundens token saknas eller är ogiltig.
+    @Test
+    void rejectsUnauthenticatedCancellation() {
+        assertEquals(401, assertThrows(ResponseStatusException.class,
+                () -> service.cancel(UUID.randomUUID(), null)).getStatusCode().value());
+        authStatus = 401;
+        assertEquals(401, assertThrows(ResponseStatusException.class,
+                () -> service.cancel(UUID.randomUUID(), "Bearer invalid")).getStatusCode().value());
+        assertEquals(0, paymentCalls);
     }
 
     // Skapar en varukorg utan kundnamn eller klientstyrt pris.

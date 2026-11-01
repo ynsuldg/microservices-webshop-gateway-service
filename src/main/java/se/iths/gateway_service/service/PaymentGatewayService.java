@@ -18,11 +18,28 @@ public class PaymentGatewayService {
     private final RestClient auth;
     private final RestClient payment;
     private final String token;
+    /**
+     * Innehåller användarnamn och roller från auth-service.
+     */
     public record User(String username, List<String> roles) { }
+    /**
+     * Anger produkt-id och antal i varukorgen.
+     */
     public record Item(Long productId, int quantity) { }
+    /**
+     * Innehåller varukorgens produkt-id:n och antal.
+     */
     public record Cart(List<Item> items) { }
 
-    // Skapar separata klienter för autentisering och betalning utan att exponera serverhemligheten.
+    /**
+     * Skapar separata klienter för autentisering och betalning utan att exponera serverhemligheten.
+     *
+     * Ingår i betalningsflödet.
+     *
+     * @param authUrl basadress till auth-service
+     * @param paymentUrl basadress till payment-service
+     * @param token delad hemlighet för interna tjänsteanrop
+     */
     public PaymentGatewayService(@Value("${app.auth-service-url}") String authUrl,
                                  @Value("${app.payment-service-url}") String paymentUrl,
                                  @Value("${internal.service-token:}") String token) {
@@ -33,7 +50,16 @@ public class PaymentGatewayService {
         this.token = token;
     }
 
-    // Hämtar kundidentiteten från verifierad JWT och skickar endast produkt-id:n och antal vidare.
+    /**
+     * Hämtar kundidentiteten från verifierad JWT och skickar endast produkt-id:n och antal vidare.
+     *
+     * Ingår i betalningsflödet.
+     *
+     * @param id id för den efterfrågade posten eller reservationen
+     * @param cart varukorgens produkter och antal
+     * @param authorization Authorization-header med kundens Bearer-token
+     * @return svaret från den skapade checkout-sessionen
+     */
     public Map<?, ?> create(UUID id, Cart cart, String authorization) {
         var user = verifyCustomer(authorization);
         checkToken();
@@ -46,7 +72,15 @@ public class PaymentGatewayService {
                 .retrieve().body(Map.class);
     }
 
-    // Hämtar endast betalningsstatus för den verifierade kunden.
+    /**
+     * Hämtar endast betalningsstatus för den verifierade kunden.
+     *
+     * Ingår i betalningsflödet.
+     *
+     * @param id id för den efterfrågade posten eller reservationen
+     * @param authorization Authorization-header med kundens Bearer-token
+     * @return checkout-sessionens aktuella status
+     */
     public Map<?, ?> status(UUID id, String authorization) {
         var user = verifyCustomer(authorization);
         checkToken();
@@ -55,7 +89,15 @@ public class PaymentGatewayService {
                 .header("X-Internal-Service-Token", token).retrieve().body(Map.class);
     }
 
-    // Avbryter endast den verifierade kundens checkout utan att acceptera kundnamn från webbläsaren.
+    /**
+     * Avbryter endast den verifierade kundens checkout utan att acceptera kundnamn från webbläsaren.
+     *
+     * Ingår i betalningsflödet.
+     *
+     * @param id id för den efterfrågade posten eller reservationen
+     * @param authorization Authorization-header med kundens Bearer-token
+     * @return checkout-sessionens aktuella status
+     */
     public Map<?, ?> cancel(UUID id, String authorization) {
         var user = verifyCustomer(authorization);
         checkToken();

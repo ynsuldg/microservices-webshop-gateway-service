@@ -27,6 +27,14 @@ public class GatewayProxyService {
     private final HttpClient httpClient;
 
 
+    /**
+     * Skapar GatewayProxyService med de beroenden och inställningar som tjänsten behöver.
+     *
+     * @param authServerUrl basadress till auth-service
+     * @param productServiceUrl basadress till product-service
+     * @param orderServiceUrl basadress till order-service
+     * @param httpClient HTTP-klient för vidarebefordrade anrop
+     */
     public GatewayProxyService(
             @Value("${app.auth-service-url}") String authServerUrl,
             @Value("${app.product-service-url}") String productServiceUrl,

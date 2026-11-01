@@ -55,6 +55,15 @@ public class PaymentGatewayService {
                 .header("X-Internal-Service-Token", token).retrieve().body(Map.class);
     }
 
+    // Avbryter endast den verifierade kundens checkout utan att acceptera kundnamn från webbläsaren.
+    public Map<?, ?> cancel(UUID id, String authorization) {
+        var user = verifyCustomer(authorization);
+        checkToken();
+        return payment.post().uri("/internal/checkouts/{id}/cancel", id)
+                .header("X-Internal-Service-Token", token)
+                .body(Map.of("customerName", user.username())).retrieve().body(Map.class);
+    }
+
     // Verifierar token hos auth-service i stället för att lita på kundnamn eller JWT-innehåll från klienten.
     private User verifyCustomer(String authorization) {
         if (authorization == null || !authorization.startsWith("Bearer ") || authorization.length() <= 7) {

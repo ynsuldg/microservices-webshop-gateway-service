@@ -58,6 +58,23 @@ public class GatewayProxyService {
     }
 
     /**
+     * Skickar DELETE till den egna användarens konto hos auth-service.
+     *
+     * @param requestBody lösenordet för att bekräfta radering
+     * @param authorization användarens Bearer-token
+     * @param contentType klientens Content-Type
+     * @return auth-services svar eller ett anslutningsfel
+     */
+    public ResponseEntity<String> deleteAccount(String requestBody, String authorization, String contentType) {
+        var builder = HttpRequest.newBuilder(URI.create(authServiceUrl.replaceAll("/+$", "") + "/appusers/me"))
+                .method("DELETE", HttpRequest.BodyPublishers.ofString(requestBody));
+        if (contentType != null && !contentType.isBlank()) {
+            builder.header(HttpHeaders.CONTENT_TYPE, contentType);
+        }
+        return send(builder, authorization);
+    }
+
+    /**
      * Vidarebefordrar ett inloggningsförsök till auth-service.
      *
      * @param requestBody oförändrad request-body från klienten

@@ -77,6 +77,19 @@ public class GatewayController {
     }
 
     /**
+     * Vidarebefordrar radering av det egna kontot med kundens JWT och lösenordsbekräftelse.
+     *
+     * @param requestBody nuvarande lösenord, utan kund-id
+     * @param request används för att läsa Authorization och Content-Type
+     * @return auth-services svar med oförändrad HTTP-status
+     */
+    @DeleteMapping("/auth/account")
+    public ResponseEntity<String> deleteAccount(@RequestBody String requestBody, HttpServletRequest request) {
+        return proxyService.deleteAccount(requestBody, request.getHeader(HttpHeaders.AUTHORIZATION),
+                request.getHeader(HttpHeaders.CONTENT_TYPE));
+    }
+
+    /**
      * Returnerar information om den inloggade användaren, baserat på JWT läst ur gatewayns HttpOnly-cookie.
      *
      * @param token JWT från cookien {@code token}

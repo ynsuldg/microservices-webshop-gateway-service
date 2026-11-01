@@ -14,9 +14,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 /**
- * Vidarebefordrar HTTP-anrop från gatewayn till rätt mikrotjänst. Varje publik metod motsvarar
- * ett specifikt anrop mot en tjänst och bygger vidare på de generiska hjälpmetoderna
- * {@link #forwardGet} och {@link #forwardPost}, som i sin tur delar logik via {@link #send}.
+ * Vidarebefordrar konto-, produkt- och orderanrop till auth-, product- och order-service.
+ * GET, POST och kontoradering med DELETE delar HTTP- och felhantering via hjälpfunktionen send.
+ * Registrering och demoåterställning skickas utan JWT; kontoradering skickar användarens token.
  */
 @Service
 public class GatewayProxyService {

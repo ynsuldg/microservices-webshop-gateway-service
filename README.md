@@ -9,6 +9,20 @@ Vid betalning, statushämtning och avbrytning verifieras kundens JWT hos auth-se
 Kundnamnet hämtas från den verifierade identiteten. Interna betalningsanrop använder tjänstens
 gemensamma hemlighet, som aldrig skickas till webbläsaren.
 
+## Kontohantering
+
+| Gateway-anrop | Vidarebefordras till auth-service |
+| --- | --- |
+| `POST /gateway/auth/register` | `POST /appusers` |
+| `POST /gateway/auth/password-reset` | `POST /appusers/password-reset` |
+| `DELETE /gateway/auth/account` | `DELETE /appusers/me` |
+
+Registrering och demoåterställning kräver ingen inloggning. Kontoradering vidarebefordrar användarens
+Bearer-token och nuvarande lösenord; auth-service avgör vilket konto som får raderas.
+Gatewayn bevarar auth-servicens statuskoder och felsvar.
+
+Lösenordsåterställningen är endast för demo och verifierar inte kontots ägare.
+
 ## Tekniker
 
 Java 21, Spring Boot 4, Spring Security, REST och Maven.

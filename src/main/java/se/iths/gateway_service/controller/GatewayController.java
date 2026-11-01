@@ -65,6 +65,18 @@ public class GatewayController {
     }
 
     /**
+     * Vidarebefordrar registrering utan att skapa en inloggningscookie.
+     *
+     * @param requestBody e-postadress och lösenord för det nya kontot
+     * @param request används för att läsa Content-Type
+     * @return auth-services registreringssvar eller felsvar
+     */
+    @PostMapping("/auth/register")
+    public ResponseEntity<String> register(@RequestBody String requestBody, HttpServletRequest request) {
+        return proxyService.register(requestBody, request.getHeader(HttpHeaders.CONTENT_TYPE));
+    }
+
+    /**
      * Returnerar information om den inloggade användaren, baserat på JWT läst ur gatewayns HttpOnly-cookie.
      *
      * @param token JWT från cookien {@code token}

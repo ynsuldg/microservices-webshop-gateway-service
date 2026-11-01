@@ -77,6 +77,18 @@ public class GatewayController {
     }
 
     /**
+     * Vidarebefordrar demoåterställning av lösenord utan krav på inloggning.
+     *
+     * @param requestBody kontots e-postadress och nytt lösenord
+     * @param request används för att läsa Content-Type
+     * @return auth-services svar med oförändrad HTTP-status
+     */
+    @PostMapping("/auth/password-reset")
+    public ResponseEntity<String> resetPassword(@RequestBody String requestBody, HttpServletRequest request) {
+        return proxyService.resetPassword(requestBody, request.getHeader(HttpHeaders.CONTENT_TYPE));
+    }
+
+    /**
      * Vidarebefordrar radering av det egna kontot med kundens JWT och lösenordsbekräftelse.
      *
      * @param requestBody nuvarande lösenord, utan kund-id

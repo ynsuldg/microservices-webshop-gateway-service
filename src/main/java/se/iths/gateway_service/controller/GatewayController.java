@@ -8,11 +8,10 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 /**
- * Enda publika ingångspunkten mot systemets mikrotjänster. Tar emot anrop från frontend
- * och vidarebefordrar dem via {@link GatewayProxyService} till auth-service, product-service
- * eller order-service. Hanterar även själva autentiseringscykeln mot frontend sätter en
- * HttpOnly-cookie med JWT vid inloggning, läser den vid {@code /auth/me}, och raderar den
- * vid utloggning.
+ * Vidarebefordrar frontendens konto-, produkt- och orderanrop till rätt mikrotjänst.
+ * Kontohanteringen omfattar registrering, inloggning, utloggning, demoåterställning av lösenord
+ * och radering av det egna kontot. Vid direkt inloggning mot gatewayn skapas dess HttpOnly-cookie;
+ * frontendens server hanterar separat sin signerade sessionscookie.
  */
 @RestController
 @RequestMapping("/gateway")
